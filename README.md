@@ -1,5 +1,5 @@
-# heeo-world
-Hi humans!
+# Hello world
 
-I like GitHub! I like this world!
-I like python,java,c,c++!
+I like GitHub!
+I like this world!
+I like Python,Java and R!
