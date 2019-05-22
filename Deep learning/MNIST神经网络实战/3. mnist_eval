@@ -1,0 +1,132 @@
+import time
+import tensorflow as tf
+from tensorflow.examples.tutorials.mnist import input_data
+import mnist_inference
+import mnist_train
+
+### 1. 每10秒加载一次最新的模型
+
+### 加载的时间间隔
+
+EVAL_INTERVAL_SECS = 10
+
+def evaluate(mnist):
+    with tf.Graph().as_default() as g:
+        x = tf.placeholder(tf.float32, [None, mnist_inference.INPUT_NODE], name='x-input')
+        y_ = tf.placeholder(tf.float32, [None, mnist_inference.OUTPUT_NODE], name='y-input')
+        validate_feed = {x: mnist.validation.images, y_: mnist.validation.labels}
+
+        y = mnist_inference.inference(x, None)
+        correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
+        accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+
+        variable_averages = tf.train.ExponentialMovingAverage(mnist_train.MOVING_AVERAGE_DECAY)
+        variables_to_restore = variable_averages.variables_to_restore()
+        saver = tf.train.Saver(variables_to_restore)
+
+        while True:
+            with tf.Session() as sess:
+                ckpt = tf.train.get_checkpoint_state(mnist_train.MODEL_SAVE_PATH)
+                if ckpt and ckpt.model_checkpoint_path:
+                    saver.restore(sess, ckpt.model_checkpoint_path)
+                    global_step = ckpt.model_checkpoint_path.split('/')[-1].split('-')[-1]
+                    accuracy_score = sess.run(accuracy, feed_dict=validate_feed)
+                    print("After %s training step(s), validation accuracy = %g" % (global_step, accuracy_score))
+                else:
+                    print('No checkpoint file found')
+                    return
+            time.sleep(EVAL_INTERVAL_SECS)
+
+### 2. 主程序
+
+def main(argv=None):
+    mnist = input_data.read_data_sets("../../../datasets/MNIST_data", one_hot=True)
+    evaluate(mnist)
+
+if __name__ == '__main__':
+    main()
+
+### 3. 运行结果
+
+Extracting ../../../datasets/MNIST_data/train-images-idx3-ubyte.gz
+Extracting ../../../datasets/MNIST_data/train-labels-idx1-ubyte.gz
+Extracting ../../../datasets/MNIST_data/t10k-images-idx3-ubyte.gz
+Extracting ../../../datasets/MNIST_data/t10k-labels-idx1-ubyte.gz
+INFO:tensorflow:Restoring parameters from MNIST_model/mnist_model-4001
+After 4001 training step(s), validation accuracy = 0.9826
+INFO:tensorflow:Restoring parameters from MNIST_model/mnist_model-5001
+After 5001 training step(s), validation accuracy = 0.983
+INFO:tensorflow:Restoring parameters from MNIST_model/mnist_model-6001
+After 6001 training step(s), validation accuracy = 0.9832
+INFO:tensorflow:Restoring parameters from MNIST_model/mnist_model-7001
+After 7001 training step(s), validation accuracy = 0.9834
+INFO:tensorflow:Restoring parameters from MNIST_model/mnist_model-8001
+After 8001 training step(s), validation accuracy = 0.9834
+INFO:tensorflow:Restoring parameters from MNIST_model/mnist_model-9001
+After 9001 training step(s), validation accuracy = 0.9834
+INFO:tensorflow:Restoring parameters from MNIST_model/mnist_model-10001
+After 10001 training step(s), validation accuracy = 0.9848
+INFO:tensorflow:Restoring parameters from MNIST_model/mnist_model-11001
+After 11001 training step(s), validation accuracy = 0.9842
+INFO:tensorflow:Restoring parameters from MNIST_model/mnist_model-12001
+After 12001 training step(s), validation accuracy = 0.9848
+INFO:tensorflow:Restoring parameters from MNIST_model/mnist_model-13001
+After 13001 training step(s), validation accuracy = 0.9846
+INFO:tensorflow:Restoring parameters from MNIST_model/mnist_model-14001
+After 14001 training step(s), validation accuracy = 0.9842
+INFO:tensorflow:Restoring parameters from MNIST_model/mnist_model-15001
+After 15001 training step(s), validation accuracy = 0.984
+INFO:tensorflow:Restoring parameters from MNIST_model/mnist_model-16001
+After 16001 training step(s), validation accuracy = 0.9852
+INFO:tensorflow:Restoring parameters from MNIST_model/mnist_model-17001
+After 17001 training step(s), validation accuracy = 0.9848
+INFO:tensorflow:Restoring parameters from MNIST_model/mnist_model-18001
+After 18001 training step(s), validation accuracy = 0.985
+INFO:tensorflow:Restoring parameters from MNIST_model/mnist_model-19001
+After 19001 training step(s), validation accuracy = 0.9858
+INFO:tensorflow:Restoring parameters from MNIST_model/mnist_model-20001
+After 20001 training step(s), validation accuracy = 0.9844
+INFO:tensorflow:Restoring parameters from MNIST_model/mnist_model-21001
+After 21001 training step(s), validation accuracy = 0.986
+INFO:tensorflow:Restoring parameters from MNIST_model/mnist_model-22001
+After 22001 training step(s), validation accuracy = 0.9854
+INFO:tensorflow:Restoring parameters from MNIST_model/mnist_model-23001
+After 23001 training step(s), validation accuracy = 0.9842
+INFO:tensorflow:Restoring parameters from MNIST_model/mnist_model-25001
+After 25001 training step(s), validation accuracy = 0.9854
+INFO:tensorflow:Restoring parameters from MNIST_model/mnist_model-26001
+After 26001 training step(s), validation accuracy = 0.9858
+INFO:tensorflow:Restoring parameters from MNIST_model/mnist_model-27001
+After 27001 training step(s), validation accuracy = 0.9858
+INFO:tensorflow:Restoring parameters from MNIST_model/mnist_model-28001
+After 28001 training step(s), validation accuracy = 0.9858
+INFO:tensorflow:Restoring parameters from MNIST_model/mnist_model-29001
+After 29001 training step(s), validation accuracy = 0.9856
+INFO:tensorflow:Restoring parameters from MNIST_model/mnist_model-29001
+After 29001 training step(s), validation accuracy = 0.9856
+INFO:tensorflow:Restoring parameters from MNIST_model/mnist_model-29001
+After 29001 training step(s), validation accuracy = 0.9856
+INFO:tensorflow:Restoring parameters from MNIST_model/mnist_model-29001
+After 29001 training step(s), validation accuracy = 0.9856
+INFO:tensorflow:Restoring parameters from MNIST_model/mnist_model-29001
+After 29001 training step(s), validation accuracy = 0.9856
+---------------------------------------------------------------------------
+KeyboardInterrupt                         Traceback (most recent call last)
+<ipython-input-3-ea3e450e8602> in <module>()
+      4 
+      5 if __name__ == '__main__':
+----> 6     main()
+
+<ipython-input-3-ea3e450e8602> in main(argv)
+      1 def main(argv=None):
+      2     mnist = input_data.read_data_sets("../../../datasets/MNIST_data", one_hot=True)
+----> 3     evaluate(mnist)
+      4 
+      5 if __name__ == '__main__':
+
+<ipython-input-2-ddf5b9a14b55> in evaluate(mnist)
+     27                     print('No checkpoint file found')
+     28                     return
+---> 29             time.sleep(EVAL_INTERVAL_SECS)
+
+KeyboardInterrupt: 
